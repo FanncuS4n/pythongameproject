@@ -13,7 +13,6 @@ from magic import MagicPlayer
 from upgrade import Upgrade
 
 class Level:
-    
 	def __init__(self):
 
 		# get the display surface 
@@ -92,8 +91,8 @@ class Level:
 									[self.visible_sprites,self.attackable_sprites],
 									self.obstacle_sprites,
 									self.damage_player,
-         							self.trigger_death_partices,
-                					self.add_xp)
+									self.trigger_death_particles,
+									self.add_exp)
 
 	def create_attack(self):
 		
@@ -101,15 +100,16 @@ class Level:
 
 	def create_magic(self,style,strength,cost):
 		if style == 'heal':
-			self.magic_player.heal(self.player, strength, cost, [self.visible_sprites])
-		elif style == 'flame':
-			self.magic_player.flame(self.player, cost, [self.visible_sprites, self.attack_sprites])
+			self.magic_player.heal(self.player,strength,cost,[self.visible_sprites])
+
+		if style == 'flame':
+			self.magic_player.flame(self.player,cost,[self.visible_sprites,self.attack_sprites])
 
 	def destroy_attack(self):
 		if self.current_attack:
 			self.current_attack.kill()
 		self.current_attack = None
-  
+
 	def player_attack_logic(self):
 		if self.attack_sprites:
 			for attack_sprite in self.attack_sprites:
@@ -130,33 +130,31 @@ class Level:
 			self.player.health -= amount
 			self.player.vulnerable = False
 			self.player.hurt_time = pygame.time.get_ticks()
-			# spawn particles
-			self.animation_player.create_particles(attack_type, self.player.rect.center, [self.visible_sprites])
+			self.animation_player.create_particles(attack_type,self.player.rect.center,[self.visible_sprites])
 
-	def trigger_death_partices(self, pos, particle_type):	
-		self.animation_player.create_particles(particle_type, pos, [self.visible_sprites])
-    
-	def add_xp(self, amount): self.player.exp += amount
+	def trigger_death_particles(self,pos,particle_type):
+
+		self.animation_player.create_particles(particle_type,pos,self.visible_sprites)
+
+	def add_exp(self,amount):
+
+		self.player.exp += amount
 
 	def toggle_menu(self):
-		self.game_paused = not self.game_paused
+
+		self.game_paused = not self.game_paused 
 
 	def run(self):
 		self.visible_sprites.custom_draw(self.player)
 		self.ui.display(self.player)
-  
-		if self.game_paused: # Display upgrade menu
+		
+		if self.game_paused:
 			self.upgrade.display()
-
-		else: #Run the game
+		else:
 			self.visible_sprites.update()
 			self.visible_sprites.enemy_update(self.player)
 			self.player_attack_logic()
-
-        
-          
-		# update and draw the game
-
+		
 
 class YSortCameraGroup(pygame.sprite.Group):
 	def __init__(self):
