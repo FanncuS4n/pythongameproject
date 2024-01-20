@@ -6,7 +6,7 @@ from entity import Entity
 class Player(Entity):
 	def __init__(self,pos,groups,obstacle_sprites,create_attack,destroy_attack,create_magic):
 		super().__init__(groups)
-		self.image = pygame.image.load('1 - level/graphics/test/player.png').convert_alpha()
+		self.image = pygame.image.load('graphics/test/player.png').convert_alpha()
 		self.rect = self.image.get_rect(topleft = pos)
 		self.hitbox = self.rect.inflate(-6,HITBOX_OFFSET['player'])
 
@@ -40,9 +40,9 @@ class Player(Entity):
 		self.stats = {'health': 100,'energy':60,'attack': 10,'magic': 4,'speed': 5}
 		self.max_stats = {'health': 300, 'energy': 140, 'attack': 20, 'magic' : 10, 'speed': 10}
 		self.upgrade_cost = {'health': 100, 'energy': 100, 'attack': 100, 'magic' : 100, 'speed': 100}
-		self.health = self.stats['health'] * 0.5
-		self.energy = self.stats['energy'] * 0.8
-		self.exp = 5000
+		self.health = self.stats['health']
+		self.energy = self.stats['energy']
+		self.exp = 0
 		self.speed = self.stats['speed']
 
 		# damage timer
@@ -51,11 +51,11 @@ class Player(Entity):
 		self.invulnerability_duration = 500
 
 		# import a sound
-		self.weapon_attack_sound = pygame.mixer.Sound('1 - level/audio/sword.wav')
+		self.weapon_attack_sound = pygame.mixer.Sound('audio/sword.wav')
 		self.weapon_attack_sound.set_volume(0.4)
 
 	def import_player_assets(self):
-		character_path = '1 - level/graphics/player/'
+		character_path = 'graphics/player/'
 		self.animations = {'up': [],'down': [],'left': [],'right': [],
 			'right_idle':[],'left_idle':[],'up_idle':[],'down_idle':[],
 			'right_attack':[],'left_attack':[],'up_attack':[],'down_attack':[]}
