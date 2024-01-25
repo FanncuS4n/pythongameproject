@@ -11,6 +11,7 @@ from enemy import Enemy
 from particles import AnimationPlayer
 from magic import MagicPlayer
 from upgrade import Upgrade
+from game_over_screen import Game_over_screen
 
 class Level:
 	def __init__(self):
@@ -18,6 +19,7 @@ class Level:
 		# get the display surface 
 		self.display_surface = pygame.display.get_surface()
 		self.game_paused = False
+		self.game_over = False
 
 		# sprite group setup
 		self.visible_sprites = YSortCameraGroup()
@@ -34,21 +36,24 @@ class Level:
 		# user interface 
 		self.ui = UI()
 		self.upgrade = Upgrade(self.player)
-
+		
+  		#death screen
+		self.game_over_screen = Game_over_screen(self.player)
+  
 		# particles
 		self.animation_player = AnimationPlayer()
 		self.magic_player = MagicPlayer(self.animation_player)
 
 	def create_map(self):
 		layouts = {
-			'boundary': import_csv_layout('map/map_FloorBlocks.csv'),
-			'grass': import_csv_layout('map/map_Grass.csv'),
-			'object': import_csv_layout('map/map_LargeObjects.csv'),
-			'entities': import_csv_layout('map/map_Entities.csv')
+			'boundary': import_csv_layout('1 - level/map/map_FloorBlocks.csv'),
+			'grass': import_csv_layout('1 - level/map/map_Grass.csv'),
+			'object': import_csv_layout('1 - level/map/map_LargeObjects.csv'),
+			'entities': import_csv_layout('1 - level/map/map_Entities.csv')
 		}
 		graphics = {
-			'grass': import_folder('graphics/Grass'),
-			'objects': import_folder('graphics/objects')
+			'grass': import_folder('1 - level/graphics/Grass'),
+			'objects': import_folder('1 - level/graphics/objects')
 		}
 
 		for style,layout in layouts.items():
@@ -131,6 +136,9 @@ class Level:
 			self.player.vulnerable = False
 			self.player.hurt_time = pygame.time.get_ticks()
 			self.animation_player.create_particles(attack_type,self.player.rect.center,[self.visible_sprites])
+   
+		if self.player.health <= 0: #Player death
+			self.game_over = True
 
 	def trigger_death_particles(self,pos,particle_type):
 
@@ -141,15 +149,28 @@ class Level:
 		self.player.exp += amount
 
 	def toggle_menu(self):
-
 		self.game_paused = not self.game_paused 
 
+	def reset_game(self):
+		self.player.kill()
+		self.obstacle_sprites.empty()
+		self.visible_sprites.empty()
+		self.current_attack.kill()
+  
+		self.game_over = False
+		self.create_map()
+	
 	def run(self):
 		self.visible_sprites.custom_draw(self.player)
 		self.ui.display(self.player)
 		
-		if self.game_paused:
+		if self.game_paused and not self.game_over:
 			self.upgrade.display()
+		elif self.game_over:
+			self.game_over_screen.display()
+			keys = pygame.key.get_pressed()
+			if keys[pygame.K_r]:
+				self.reset_game()
 		else:
 			self.visible_sprites.update()
 			self.visible_sprites.enemy_update(self.player)
@@ -167,7 +188,7 @@ class YSortCameraGroup(pygame.sprite.Group):
 		self.offset = pygame.math.Vector2()
 
 		# creating the floor
-		self.floor_surf = pygame.image.load('graphics/tilemap/ground.png').convert()
+		self.floor_surf = pygame.image.load('1 - level/graphics/tilemap/ground.png').convert()
 		self.floor_rect = self.floor_surf.get_rect(topleft = (0,0))
 
 	def custom_draw(self,player):
