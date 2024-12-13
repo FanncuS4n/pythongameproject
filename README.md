@@ -38,10 +38,7 @@ Follow these steps to set up and play the Zelda-Style RPG:
 git clone https://github.com/FanncuS4n/pythongameproject.git
 
 # Navigate to the project directory
-cd zelda-style-rpg
-
-# Install dependencies (if any)
-pip install -r requirements.txt
+cd 1 - level/code/
 
 # Run the game
 python main.py
